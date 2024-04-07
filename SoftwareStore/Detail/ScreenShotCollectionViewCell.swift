@@ -28,7 +28,6 @@ final class ScreenShotCollectionViewCell: UICollectionViewCell {
     
     func configureCell(element: String) {
         imageView.kf.setImage(with: URL(string: element))
-        print("여기", element)
     }
     
     required init?(coder: NSCoder) {

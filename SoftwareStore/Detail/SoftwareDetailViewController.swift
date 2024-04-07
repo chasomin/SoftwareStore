@@ -47,7 +47,6 @@ final class SoftwareDetailViewController: UIViewController, CommonViewController
         output.downloadButtonTap
             .drive(with: self) { owner, _ in
                 guard let url = URL(string: owner.software.trackViewUrl) else { return }
-//                owner.navigationController?.pushViewController(WebViewController(url: URLRequest(url: url)), animated: true)
                 owner.present(WebViewController(url: URLRequest(url: url)), animated: true)
             }
             .disposed(by: disposeBag)
