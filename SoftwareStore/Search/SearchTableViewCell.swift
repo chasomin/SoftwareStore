@@ -8,9 +8,13 @@
 import UIKit
 import SnapKit
 import Kingfisher
+import RxSwift
+
 
 final class SearchTableViewCell: UITableViewCell {
     static let id = SearchTableViewCell.description()
+    
+    var disposeBag = DisposeBag()
     
     let appNameLabel = UILabel()
     let appIconImageView = UIImageView()
@@ -26,6 +30,12 @@ final class SearchTableViewCell: UITableViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        disposeBag = DisposeBag()
     }
     
     func configureCell(element: Result) {
