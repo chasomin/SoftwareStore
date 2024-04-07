@@ -36,6 +36,7 @@ class NavigationView: UIView {
         icon.tintColor = .black
         searchBar.placeholder = "앱을 검색해보세요"
         searchBar.searchBarStyle = .minimal
+        searchBar.tintColor = .black
     }
     
     required init?(coder: NSCoder) {
