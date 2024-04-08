@@ -77,6 +77,11 @@ final class SearchViewController: UIViewController, CommonViewController {
             }
             .disposed(by: disposeBag)
         
+        output.networkError
+            .drive(with: self) { owner, _ in
+                owner.showToast()
+            }
+            .disposed(by: disposeBag)
 
 
         
