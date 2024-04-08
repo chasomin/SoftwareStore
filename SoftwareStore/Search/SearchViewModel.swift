@@ -27,17 +27,26 @@ final class SearchViewModel: CommonViewModel {
 //        let downloadTap: Driver<Void>
         let freeButtonTap: Driver<[Result]>
         let paidButtonTap: Driver<[Result]>
+        let networkError: Driver<Error>
     }
     
     func transform(input: Input) -> Output {
         let origin = PublishSubject<[Result]>()
         let software = PublishSubject<[Result]>()
+        let networkError = PublishSubject<Error>()
 
         input.searchButtonTap
+            .throttle(.seconds(2), scheduler: MainScheduler.instance)
+            .debug()
             .withLatestFrom(input.searchText.orEmpty)
             .flatMap {
-                StoreNetwork.fetchStore(searchText: $0)
+                StoreNetwork.fetchStoreSingle(searchText: $0)
+                    .catch { error in
+                        networkError.onNext(error)
+                        return Single<[Result]>.never()
+                    }
             }
+            .share()
             .subscribe(onNext: { result in
                 software.onNext(result)
                 origin.onNext(result)
@@ -69,7 +78,7 @@ final class SearchViewModel: CommonViewModel {
             .disposed(by: disposeBag)
 
         
-        return Output.init(software: software, selectSofeware: input.tableViewItem.asDriver(), freeButtonTap: freeButtonTap, paidButtonTap: paidButtonTap)
+        return Output.init(software: software, selectSofeware: input.tableViewItem.asDriver(), freeButtonTap: freeButtonTap, paidButtonTap: paidButtonTap, networkError: networkError.asDriver(onErrorJustReturn: APIError.decodingError))
     }
     
 }
