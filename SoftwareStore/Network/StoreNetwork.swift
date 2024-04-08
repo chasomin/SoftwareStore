@@ -51,4 +51,39 @@ final class StoreNetwork {
             return Disposables.create()
         }
     }
+    
+    
+    static func fetchStoreSingle(searchText: String) -> Single<[Result]> {
+        
+        return Single<[Result]>.create { single in
+            guard let url = URL(string: "https://itunes.apple.com/search?term=\(searchText)&country=KR&media=software") else {
+                single(.failure(APIError.invalidURL))
+                return Disposables.create()
+            }
+            URLSession.shared.dataTask(with: url) { data, response, error in
+                if let _ = error {
+                    single(.failure(APIError.unknownResponse))
+                    return
+                }
+                
+                guard let response = response as? HTTPURLResponse, (200...299).contains(response.statusCode) else {
+                    single(.failure(APIError.statusError))
+                    return
+                }
+                
+                guard let data else { return }
+                
+                do {
+                    let appData = try JSONDecoder().decode(Store.self, from: data)
+                    single(.success(appData.results))
+                }
+                catch {
+                    single(.failure(APIError.decodingError))
+                }
+            }
+            .resume()
+            return Disposables.create()
+        }
+        .debug("FetchSingle❗️")
+    }
 }
